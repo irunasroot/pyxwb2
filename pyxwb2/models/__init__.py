@@ -2,7 +2,7 @@ class LoadDataMixin:
     @classmethod
     def load_data(cls, data):
         obj = cls()
-        for k, v in data:
+        for k, v in data.items():
             obj.__setattr__(k, v)
         return obj
 

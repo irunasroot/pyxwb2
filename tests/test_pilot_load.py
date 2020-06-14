@@ -10,7 +10,7 @@ class TestPilotLoad(unittest.TestCase):
     def setUp(self):
         self.pilots_known = [
             {
-                "id": "bladesquadronveteran-asf01bwing",
+                "id": "bladesquadronveteran",
                 "upgrades": {
                     "title": ["awingtestpilot"],
                     "missile": ["chardaanrefit"],
@@ -22,6 +22,11 @@ class TestPilotLoad(unittest.TestCase):
                         "pilot_id": 30
                     }
                 }
+            }
+        ]
+        self.pilots_known1 = [
+            {
+                "id": "zeborrelios",
             }
         ]
         self.pilots_unknown = [
@@ -43,6 +48,7 @@ class TestPilotLoad(unittest.TestCase):
         self.faction = Faction.load_data("rebelalliance")
         self.pilots1_known = Pilots.load_data(self.pilots_known, self.faction)
         self.pilots2_known = Pilots.load_data(self.pilots_known, self.faction)
+        self.pilots3_known = Pilots.load_data(self.pilots_known1, self.faction)
 
     def test_known_pilot(self):
         self.assertGreater(len(self.pilots1_known), 0)
@@ -67,3 +73,6 @@ class TestPilotLoad(unittest.TestCase):
 
         with self.assertRaises(PilotsMissingException):
             self.pilots1_unknown = Pilots.load_data(self.pilots_unknown, self.faction)
+
+    def test_ship_ability(self):
+        self.assertIn("ship_ability", self.pilots3_known[0])

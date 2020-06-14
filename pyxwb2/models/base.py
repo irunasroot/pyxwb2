@@ -8,10 +8,6 @@ from pyxwb2 import manifest
 from .exceptions import FactionMissingException
 
 
-class ShipAbility(LoadDataMixin):
-    pass
-
-
 class Faction(BaseMixin):
     def __init__(self):
         self.name = None
@@ -56,14 +52,13 @@ class Ship:
         self._skip_attr = ["pilots", "actions"]
 
     @classmethod
-    def load_data(cls, data):
+    def load_data(cls, ship_data):
         obj = cls()
-        for k, v in data["ship"].items():
+        for k, v in ship_data.items():
             if k in obj._skip_attr:
                 continue
             obj.__setattr__(k, v)
 
-        obj.__setattr__("faction", data["faction"])
         return obj
 
 

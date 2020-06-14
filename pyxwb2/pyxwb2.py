@@ -1,7 +1,5 @@
 import json
-from jsonpath_rw import parse
 
-from . import manifest
 from .models.base import Faction
 from .models.pilot import Pilots
 
@@ -9,12 +7,7 @@ from .models.pilot import Pilots
 class XwingSquadron:
 
     def __init__(self, trust_source=False):
-        self.version = None
         self.trust_source = trust_source
-
-        # Mandatory attributes
-        self.faction = None
-        self.pilots = None
 
         # Optional attributes
         self.name = None
@@ -35,7 +28,7 @@ class XwingSquadron:
 
         if isinstance(xws, str):
             with open(xws, "r") as xws_file:
-                _xws_data = json.loads(xws_file)
+                _xws_data = json.load(xws_file)
         elif isinstance(xws, dict):
             _xws_data = xws
         else:
@@ -45,6 +38,6 @@ class XwingSquadron:
         self.version = _xws_data.get("version")
         self.name = _xws_data.get("name")
         self.description = _xws_data.get("description")
-        self.faction = Faction.load_data(_xws_data.get("faction"))
 
-        self.pilots = Pilots.load_data(_xws_data["pilots"], self.faction)
+        self.faction = Faction.load_data(_xws_data.get("faction"))
+        self.pilots = Pilots.load_data(_xws_data.get("pilots"), self.faction)
