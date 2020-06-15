@@ -76,3 +76,7 @@ class TestPilotLoad(unittest.TestCase):
 
     def test_ship_ability(self):
         self.assertIn("ship_ability", self.pilots3_known[0])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,4 +1,7 @@
+import jsonschema
 import json
+
+from pathlib import Path, PurePath
 
 from .models.base import Faction
 from .models.pilot import Pilots
@@ -9,12 +12,14 @@ class XwingSquadron:
     def __init__(self, trust_source=False):
         self.trust_source = trust_source
 
-        # Optional attributes
         self.name = None
         self.description = None
         self.obstacles = None
         self.points = None
         self.vendor = None
+        self.version = None
+        self.faction = None
+        self.pilots = None
 
     def import_squad(self, xws):
         """
@@ -35,9 +40,22 @@ class XwingSquadron:
             raise ValueError("Unable to load data set. Be sure to pass in a string of the filename or"
                              "an already loaded dict from the xws json file.")
 
+        # Validate the schema if we dont trust the source. Other validation happens for required items
+        # even if this is bypassed.
+        if not self.trust_source:
+            self._validate_schema(_xws_data)
+
         self.version = _xws_data.get("version")
         self.name = _xws_data.get("name")
         self.description = _xws_data.get("description")
 
         self.faction = Faction.load_data(_xws_data.get("faction"))
         self.pilots = Pilots.load_data(_xws_data.get("pilots"), self.faction)
+
+    @staticmethod
+    def _validate_schema(xws_data):
+        schema_fn = PurePath(Path(__file__).parents[0], "data/xws_schema.json").as_posix()
+        with open(schema_fn, "r") as f:
+            schema = json.load(f)
+
+        jsonschema.validate(instance=xws_data, schema=schema)

@@ -2,8 +2,8 @@ from pathlib import Path, PurePath
 from jsonpath2.path import Path as JPath
 import json
 
-from . import BaseMixin, LoadDataMixin
-from pyxwb2 import manifest
+from . import BaseMixin
+from pyxwb2.utils import manifest
 
 from .exceptions import FactionMissingException
 

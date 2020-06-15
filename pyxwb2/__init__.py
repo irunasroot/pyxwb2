@@ -1,9 +1,3 @@
-import json
+from .pyxwb2 import XwingSquadron
 
-from pathlib import Path, PurePath
-
-__version__ = "0.0.2a"
-
-manifest_file = PurePath(Path(__file__).parents[0], "data/manifest.json").as_posix()
-with open(manifest_file, "r") as f:
-    manifest = json.load(f)
+__version__ = "0.0.3a"

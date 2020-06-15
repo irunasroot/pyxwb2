@@ -2,7 +2,7 @@ import json
 from pathlib import Path, PurePath
 from jsonpath2.path import Path as JPath
 
-from pyxwb2 import manifest
+from pyxwb2.utils import manifest
 
 from . import BaseMixin
 from .base import Ship
