@@ -2,17 +2,46 @@ from pathlib import Path, PurePath
 from jsonpath2.path import Path as JPath
 import json
 
-from . import BaseMixin
+from . import BaseItemListMixin, ReperMixin
+from .misc import ShipDial
 from pyxwb2.utils import manifest
 
 from .exceptions import FactionMissingException
 
 
-class Faction(BaseMixin):
+class Factions(BaseItemListMixin):
+    def __iter__(self):
+        return iter(self._items)
+
+    def __repr__(self):
+        return f"Factions({[f for f in self._items]})"
+
+    def __contains__(self, item):
+        all_names = [p.xws for p in self._items] + [p.name for p in self._items]
+        return item in all_names
+
+    def append(self, faction):
+        if isinstance(faction, Faction):
+            self._items.append(faction)
+
+    @classmethod
+    def load_data(cls, factions):
+        obj = cls()
+
+        for faction in factions:
+            obj._items.add(Faction.load_data(faction))
+
+        return obj
+
+
+class Faction:
     def __init__(self):
         self.name = None
         self.xws = None
         self.ffg = None
+
+    def __repr__(self):
+        return f"Faction(name='{self.name}', xws='{self.xws}'"
 
     @classmethod
     def load_data(cls, faction_name):
@@ -43,13 +72,23 @@ class Faction(BaseMixin):
 
         return obj
 
-    # def __repr__(self):
-    #     return f"Faction(name='{self.name}', xws='{self.xws}', ffg={self.ffg})"
+
+class Ships(BaseItemListMixin, ReperMixin):
+    def append(self, ship):
+        if isinstance(ship, Ship):
+            self._items.append(ship)
 
 
 class Ship:
     def __init__(self):
-        self._skip_attr = ["pilots", "actions"]
+        self._skip_attr = ["pilots", "actions, dial"]
+        self.name = None
+        self.xws = None
+        self.size = None
+        self.faction = None
+
+    def __repr__(self):
+        return f"Ship(name='{self.name}', xws='{self.xws}', size='{self.size}', faction={self.faction})"
 
     @classmethod
     def load_data(cls, ship_data):
@@ -58,15 +97,12 @@ class Ship:
             if k in obj._skip_attr:
                 continue
             obj.__setattr__(k, v)
+        obj.__setattr__("dial", ShipDial.load_data(ship_data["dial"]))
 
         return obj
 
 
 class Upgrade:
-    pass
-
-
-class ShipDial:
     pass
 
 

@@ -4,15 +4,18 @@ from jsonpath2.path import Path as JPath
 
 from pyxwb2.utils import manifest
 
-from . import BaseMixin
+from . import ReperMixin
 from .base import Ship
 from .misc import ShipAbility
 from .exceptions import PilotsMissingException
 
 
-class Pilot(BaseMixin):
+class Pilot(ReperMixin):
     def __init__(self):
         self._skip_attr = ["vendor", "alt", "shipAbility"]
+
+    def __contains__(self, item):
+        return item in self.__dict__
 
     @classmethod
     def load_data(cls, pilot_data):
@@ -22,13 +25,16 @@ class Pilot(BaseMixin):
                 if k in obj._skip_attr:
                     continue
                 obj.__setattr__(k, v)
+
+                if "shipAbility" in pilot_data:
+                    obj.__setattr__("ship_ability", ShipAbility.load_data(pilot_data["shipAbility"]))
         except IndexError:
             pass
 
         return obj
 
 
-class Pilots(BaseMixin):
+class Pilots(ReperMixin):
     def __init__(self):
         # self.__setattr__("pilots", list())
         self.pilots = list()
@@ -56,6 +62,10 @@ class Pilots(BaseMixin):
             return False
 
         return item in all_names
+
+    def append(self, pilot):
+        if isinstance(pilot, Pilot):
+            self.pilots.append(pilot)
 
     @classmethod
     def load_data(cls, pilots, faction):
@@ -91,9 +101,7 @@ class Pilots(BaseMixin):
 
                 pilot = Pilot.load_data(pilot_file_data[0])
                 pilot.__setattr__("ship", Ship.load_data(ship_file_data))
-                if "shipAbility" in pilot_file_data[0]:
-                    pilot.__setattr__("ship_ability", ShipAbility.load_data(pilot_file_data[0]["shipAbility"]))
-
+                pilot.__setattr__("faction", faction)
                 obj.pilots.append(pilot)
 
         if not len(obj):
