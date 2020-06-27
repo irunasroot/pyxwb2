@@ -2,9 +2,29 @@ import jsonschema
 import json
 
 from pathlib import Path, PurePath
+from jsonpath2 import Path as JPath
 
-from .models.base import Faction
-from .models.pilot import Pilots
+from .models.base import Faction, Factions, Ship, Ships
+from .models.misc import Actions, Conditions, DamageDeck, ShipStats
+from .models.pilot import Pilots, Pilot
+from .utils import manifest
+
+_local_path = Path(__file__).parents[0]
+
+
+def _load_complex_manifest_data(cls, manifest_set, inner_set=None):
+    obj = cls()
+    for set_file in manifest[manifest_set]:
+        with open(PurePath(_local_path, set_file).as_posix(), "r") as f:
+            _set = json.load(f)
+        try:
+            for _dc in _set[inner_set]:
+                obj.append(obj._singular.load_data(_dc))
+        except (KeyError, TypeError):
+            for _dc in _set:
+                obj.append(obj._singular.load_data(_dc))
+
+    return obj
 
 
 class XwingSquadron:
@@ -54,8 +74,48 @@ class XwingSquadron:
 
     @staticmethod
     def _validate_schema(xws_data):
-        schema_fn = PurePath(Path(__file__).parents[0], "data/xws_schema.json").as_posix()
+        schema_fn = PurePath(_local_path, "data/xws_schema.json").as_posix()
         with open(schema_fn, "r") as f:
             schema = json.load(f)
 
         jsonschema.validate(instance=xws_data, schema=schema)
+
+
+class XwingDataPack:
+    def __init__(self):
+        self.factions = Factions()
+        self.pilots = Pilots()
+        self.ships = Ships()
+        self.actions = Actions()
+
+        self._load()
+
+    def _load(self):
+        factions_jpath = JPath.parse_str("$.pilots.*.faction")
+        _factions = [m.current_value for m in factions_jpath.match(manifest)]
+
+        for pilot in manifest["pilots"]:
+            _faction = Faction.load_data(pilot["faction"])
+            self.factions.append(_faction)
+            for ship in pilot["ships"]:
+                with open(PurePath(_local_path, ship).as_posix(), "r") as f:
+                    ship_data = json.load(f)
+
+                _ship = Ship.load_data(ship_data)
+                _ship.faction = _faction
+                self.ships.append(_ship)
+
+                for pilot_data in ship_data["pilots"]:
+                    _pilot = Pilot.load_data(pilot_data)
+                    _pilot.__setattr__("faction", _faction)
+                    _pilot.__setattr__("ship", _ship)
+                    self.pilots.append(_pilot)
+
+        self.actions = _load_complex_manifest_data(Actions, "actions")
+
+        with open(PurePath(_local_path, manifest["conditions"]).as_posix(), "r") as f:
+            self.conditions = Conditions.load_data(json.load(f))
+
+        self.damage_deck = _load_complex_manifest_data(DamageDeck, "damagedecks", "cards")
+        self.stats = _load_complex_manifest_data(ShipStats, "stats")
+

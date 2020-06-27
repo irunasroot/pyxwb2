@@ -2,36 +2,11 @@ from pathlib import Path, PurePath
 from jsonpath2.path import Path as JPath
 import json
 
-from . import BaseItemListMixin, ReperMixin
-from .misc import ShipDial
+from . import BaseItemListMixin
+from .misc import ShipDial, Actions, ShipStats
 from pyxwb2.utils import manifest
 
 from .exceptions import FactionMissingException
-
-
-class Factions(BaseItemListMixin):
-    def __iter__(self):
-        return iter(self._items)
-
-    def __repr__(self):
-        return f"Factions({[f for f in self._items]})"
-
-    def __contains__(self, item):
-        all_names = [p.xws for p in self._items] + [p.name for p in self._items]
-        return item in all_names
-
-    def append(self, faction):
-        if isinstance(faction, Faction):
-            self._items.append(faction)
-
-    @classmethod
-    def load_data(cls, factions):
-        obj = cls()
-
-        for faction in factions:
-            obj._items.add(Faction.load_data(faction))
-
-        return obj
 
 
 class Faction:
@@ -73,15 +48,26 @@ class Faction:
         return obj
 
 
-class Ships(BaseItemListMixin, ReperMixin):
-    def append(self, ship):
-        if isinstance(ship, Ship):
-            self._items.append(ship)
+class Factions(BaseItemListMixin):
+    _singular = Faction
+
+    def __contains__(self, item):
+        all_names = [p.xws for p in self._items] + [p.name for p in self._items]
+        return item in all_names
+
+    @classmethod
+    def load_data(cls, factions):
+        obj = cls()
+
+        for faction in factions:
+            obj._items.add(Faction.load_data(faction))
+
+        return obj
 
 
 class Ship:
     def __init__(self):
-        self._skip_attr = ["pilots", "actions, dial"]
+        self._skip_attr = ["pilots", "actions, dial, stats"]
         self.name = None
         self.xws = None
         self.size = None
@@ -98,28 +84,15 @@ class Ship:
                 continue
             obj.__setattr__(k, v)
         obj.__setattr__("dial", ShipDial.load_data(ship_data["dial"]))
+        obj.__setattr__("actions", Actions.load_data(ship_data["actions"]))
+        obj.__setattr__("stats", ShipStats.load_data(ship_data["stats"]))
 
         return obj
 
 
-class Upgrade:
-    pass
+class Ships(BaseItemListMixin):
+    _singular = Ship
 
-
-class ShipArc:
-    pass
-
-
-class ShipStat:
-    pass
-
-class Action:
-    pass
-
-
-class Conditions:
-    pass
-
-
-class Damage:
-    pass
+    def __contains__(self, item):
+        all_names = [s.xws for s in self._items] + [s.name for s in self._items]
+        return item in all_names

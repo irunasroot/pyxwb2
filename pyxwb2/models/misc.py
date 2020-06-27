@@ -1,9 +1,50 @@
-from . import LoadDataMixin, ReperMixin
+from . import LoadDataMixin, ReperMixin, BaseItemListMixin
 from pyxwb2.utils import manifest
 
 
 class ShipAbility(LoadDataMixin, ReperMixin):
     pass
+
+
+# TODO: Upgrades
+class Upgrade(LoadDataMixin, ReperMixin):
+    pass
+
+
+class Upgrades(BaseItemListMixin):
+    _singular = Upgrade
+
+
+class DamageCard(LoadDataMixin, ReperMixin):
+    pass
+
+
+class DamageDeck(BaseItemListMixin):
+    _singular = DamageCard
+
+
+class Condition(LoadDataMixin, ReperMixin):
+    pass
+
+
+class Conditions(BaseItemListMixin):
+    _singular = Condition
+
+
+class ShipStat(LoadDataMixin, ReperMixin):
+    pass
+
+
+class ShipStats(BaseItemListMixin):
+    _singular = ShipStat
+
+
+class Action(LoadDataMixin, ReperMixin):
+    pass
+
+
+class Actions(BaseItemListMixin):
+    _singular = Action
 
 
 class Maneuver(ReperMixin):

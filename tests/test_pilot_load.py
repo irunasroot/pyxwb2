@@ -59,7 +59,6 @@ class TestPilotLoad(unittest.TestCase):
         We need to be sure all three of these types of checks can work
         """
 
-        self.assertIn(self.pilots1_known.pilots[0], self.pilots2_known)
         self.assertIn("bladesquadronveteran", self.pilots1_known)
         self.assertIn("Blade Squadron Veteran", self.pilots2_known)
 

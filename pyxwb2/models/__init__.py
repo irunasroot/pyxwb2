@@ -8,8 +8,11 @@ class LoadDataMixin:
 
 
 class BaseItemListMixin:
-    def __init__(self):
+    def __init__(self, _singular=None):
         self._items = list()
+
+        if _singular:
+            self._singular = _singular
 
     def __len__(self):
         return len(self._items)
@@ -18,7 +21,21 @@ class BaseItemListMixin:
         return self._items[item]
 
     def __iter__(self):
-        return iter(self.__dict__.keys())
+        return iter(self._items)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({[f for f in self._items]})"
+
+    def append(self, item, _singular=None):
+        if isinstance(item, self._singular):
+            self._items.append(item)
+
+    @classmethod
+    def load_data(cls, data):
+        obj = cls()
+        for action in data:
+            obj._items.append(obj._singular.load_data(action))
+        return obj
 
 
 class ReperMixin:

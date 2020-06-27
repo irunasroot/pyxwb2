@@ -4,7 +4,7 @@ from jsonpath2.path import Path as JPath
 
 from pyxwb2.utils import manifest
 
-from . import ReperMixin
+from . import ReperMixin, BaseItemListMixin
 from .base import Ship
 from .misc import ShipAbility
 from .exceptions import PilotsMissingException
@@ -34,38 +34,16 @@ class Pilot(ReperMixin):
         return obj
 
 
-class Pilots(ReperMixin):
-    def __init__(self):
-        # self.__setattr__("pilots", list())
-        self.pilots = list()
-        self.ship = None
-
-    def __repr__(self):
-        return f"Pilots({[p for p in self.pilots]})"
-
-    def __len__(self):
-        return len(self.pilots)
-
-    def __iter__(self):
-        return iter(self.pilots)
+class Pilots(BaseItemListMixin, ReperMixin):
+    _singular = Pilot
 
     def __getitem__(self, item):
-        return self.pilots[item]
+        return self._items[item]
 
     def __contains__(self, item):
-        all_names = [p.xws for p in self.pilots] + [p.name for p in self.pilots]
-
-        if isinstance(item, Pilot):
-            for pilot in self.pilots:
-                if pilot.xws in all_names or pilot.name in all_names:
-                    return True
-            return False
+        all_names = [p.xws for p in self._items] + [p.name for p in self._items]
 
         return item in all_names
-
-    def append(self, pilot):
-        if isinstance(pilot, Pilot):
-            self.pilots.append(pilot)
 
     @classmethod
     def load_data(cls, pilots, faction):
@@ -77,7 +55,6 @@ class Pilots(ReperMixin):
         but instead will use the Pilot object and search if the same pilot is contained in Pilots
         e.g. 'bladesquadronveteran' in Pilots
         or   'Blade Squadron Veteran' in Pilots
-        or   my_pilot in Pilots
 
         :param pilots: Pass in a list of pilots to process. The list should be the direct list of pilots in
                        accordance with the xws spec
@@ -99,10 +76,12 @@ class Pilots(ReperMixin):
                 if not pilot_file_data:
                     continue
 
-                pilot = Pilot.load_data(pilot_file_data[0])
-                pilot.__setattr__("ship", Ship.load_data(ship_file_data))
-                pilot.__setattr__("faction", faction)
-                obj.pilots.append(pilot)
+                _ship = Ship.load_data(ship_file_data)
+                _ship.faction = faction
+                _pilot = Pilot.load_data(pilot_file_data[0])
+                _pilot.__setattr__("ship", _ship)
+                _pilot.__setattr__("faction", faction)
+                obj._items.append(_pilot)
 
         if not len(obj):
             raise PilotsMissingException("Found no valid pilots, be sure you have valid pilots "
