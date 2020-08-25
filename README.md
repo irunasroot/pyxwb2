@@ -1,6 +1,57 @@
-# pyxwb2
+# Python Xwing Builder for X-wing v2.0
 
-# Citing
+An Xwing builder written in python
+
+## Installation
+Install from pypi
+```bash
+pip install pyxwb2
+```
+
+Install locally
+```bash
+git clone https://github.com/minsis/pyxwb2.git
+cd pyxwb2
+pip install .
+```
+
+## Usage
+There are two separate libraries to use here: one fro loading XWS import data 
+and one for loading the entire xwing-data pack for usage in an app or web app, etc
+
+### XWS Data Load
+To load and validate an XWB json file you can load it in. With a basic XWS load you get
+a full manifest of data for the pilots included.
+
+```python
+from pyxwb2 import XwingSquadron
+
+squadron = XwingSquadron()
+squadron.import_squad("xws-squad.json")
+```
+
+As per the XWS standard point costs are ignored on import and loaded from the manifest.
+If the source is trusted then the json schema is ignored.
+
+To load trusted data
+```python
+from pyxwb2 import XwingSquadron
+
+squadron = XwingSquadron(trust_source=True)
+squadron.import_squad("xws-squad.json")
+```
+
+### X-wing Data Pack
+This loads the entire manifest data from xwing-data. Gives you access to the entire data
+strcutre that it has to offer.
+
+```python
+from pyxwb2 import XwingDataPack
+
+data = XwingDataPack()
+```
+
+## Citing
 
 ### xwing-data2
 The dataset included is provided by guidokessels/xwing-data2 under the MIT license

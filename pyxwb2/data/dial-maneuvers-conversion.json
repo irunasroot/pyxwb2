@@ -1,0 +1,92 @@
+{
+  "difficulty": {
+    "R": {
+      "name": "Red",
+      "xws": "red"
+    },
+    "W": {
+      "name": "White",
+      "xws": "white"
+    },
+    "B": {
+      "name": "Blue",
+      "xws": "blue"
+    },
+    "G": {
+      "name": "Green",
+      "xws": "green"
+    }
+  },
+  "maneuvers": {
+    "T": {
+      "name": "Left Turn",
+      "direction": "Left",
+      "xws": "leftturn"
+    },
+    "Y": {
+      "name": "Right Turn",
+      "direction": "Right",
+      "xws": "rightturn"
+    },
+    "B": {
+      "name": "Left Bank",
+      "direction": "Left",
+      "xws": "leftbank"
+    },
+    "N": {
+      "name": "Right Bank",
+      "direction": "Right",
+      "xws": "rightbank"
+    },
+    "F": {
+      "name": "Straight",
+      "direction": "straight",
+      "xws": "straight"
+    },
+    "A": {
+      "name": "Left Reverse Bank",
+      "direction": "Left",
+      "xws": "leftreversebank"
+    },
+    "D": {
+      "name": "Right Reverse Bank",
+      "direction": "Right",
+      "xws": "rightreversebank"
+    },
+    "S": {
+      "name": "Reverse Straight",
+      "direction": "straight",
+      "xws": "reversestraight"
+    },
+    "E": {
+      "name": "Left Tallon Roll",
+      "direction": "Left",
+      "xws": "lefttallonroll"
+    },
+    "R": {
+      "name": "Right Tallon Roll",
+      "direction": "Right",
+      "xws": "righttallonroll"
+    },
+    "L": {
+      "name": "Left Segnor’s Loop",
+      "direction": "Left",
+      "xws": "leftsegnorsloop"
+    },
+    "P": {
+      "name": "Right Segnor's Loop",
+      "direction": "Right",
+      "xws": "rightsegnorsloop"
+    },
+    "K": {
+      "name": "Koiogran Turn",
+      "direction": "Straight",
+      "xws": "koiogranturn"
+    },
+    "O": {
+      "name": "Stationary",
+      "direction": null,
+      "xws": "stationary"
+    }
+  }
+}

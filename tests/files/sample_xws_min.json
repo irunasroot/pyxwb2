@@ -1,0 +1,11 @@
+{
+    "faction": "separatistalliance",
+	"version": "2.0.0",
+    "pilots": [
+        {
+            "id": "bombardmentdrone",
+            "upgrades": {
+            }
+        }
+    ]
+}
