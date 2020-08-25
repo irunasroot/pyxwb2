@@ -8,11 +8,11 @@ class LoadDataMixin:
 
 
 class BaseItemListMixin:
-    def __init__(self, _singular=None):
+    def __init__(self, singular=None):
         self._items = list()
 
-        if _singular:
-            self._singular = _singular
+        if singular:
+            self.__singular__ = singular
 
     def __len__(self):
         return len(self._items)
@@ -26,15 +26,15 @@ class BaseItemListMixin:
     def __repr__(self):
         return f"{self.__class__.__name__}({[f for f in self._items]})"
 
-    def append(self, item, _singular=None):
-        if isinstance(item, self._singular):
+    def append(self, item):
+        if isinstance(item, self.__singular__):
             self._items.append(item)
 
     @classmethod
     def load_data(cls, data):
         obj = cls()
         for action in data:
-            obj._items.append(obj._singular.load_data(action))
+            obj._items.append(obj.__singular__.load_data(action))
         return obj
 
 
@@ -47,3 +47,18 @@ class ReperMixin:
 
         all_attrs = ", ".join([f"{k}={encap_quotes(v)}" for k, v in self.__dict__.items() if not k.startswith('_')])
         return f"{self.__class__.__name__}({all_attrs})"
+
+
+class SearchableItemMixin:
+    _items = list()
+
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            return self._items[item]
+        elif isinstance(item, str):
+            _tmp = self.__class__()
+            for maneuver in self._items:
+                for c in maneuver:
+                    if item.lower() in str(getattr(maneuver, c)).lower():
+                        _tmp._items.append(maneuver)
+            return _tmp

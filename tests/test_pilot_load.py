@@ -2,6 +2,7 @@ import unittest
 
 from pyxwb2.models.pilot import Pilots
 from pyxwb2.models.base import Faction
+from pyxwb2.models.misc import ShipDial, Maneuver
 from pyxwb2.models.exceptions import PilotsMissingException
 
 
@@ -75,6 +76,10 @@ class TestPilotLoad(unittest.TestCase):
 
     def test_ship_ability(self):
         self.assertIn("ship_ability", self.pilots3_known[0])
+
+    def test_search_ship_dial(self):
+        self.assertIsInstance(self.pilots1_known[0].ship.dial["1"], ShipDial)
+        self.assertIsInstance(self.pilots1_known[0].ship.dial[1], Maneuver)
 
 
 if __name__ == "__main__":

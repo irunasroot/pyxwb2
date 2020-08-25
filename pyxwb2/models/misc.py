@@ -1,4 +1,4 @@
-from . import LoadDataMixin, ReperMixin, BaseItemListMixin
+from . import LoadDataMixin, ReperMixin, BaseItemListMixin, SearchableItemMixin
 from pyxwb2.utils import manifest
 
 
@@ -6,13 +6,12 @@ class ShipAbility(LoadDataMixin, ReperMixin):
     pass
 
 
-# TODO: Upgrades
 class Upgrade(LoadDataMixin, ReperMixin):
     pass
 
 
 class Upgrades(BaseItemListMixin):
-    _singular = Upgrade
+    __singular__ = Upgrade
 
 
 class DamageCard(LoadDataMixin, ReperMixin):
@@ -20,7 +19,7 @@ class DamageCard(LoadDataMixin, ReperMixin):
 
 
 class DamageDeck(BaseItemListMixin):
-    _singular = DamageCard
+    __singular__ = DamageCard
 
 
 class Condition(LoadDataMixin, ReperMixin):
@@ -28,7 +27,7 @@ class Condition(LoadDataMixin, ReperMixin):
 
 
 class Conditions(BaseItemListMixin):
-    _singular = Condition
+    __singular__ = Condition
 
 
 class ShipStat(LoadDataMixin, ReperMixin):
@@ -36,7 +35,7 @@ class ShipStat(LoadDataMixin, ReperMixin):
 
 
 class ShipStats(BaseItemListMixin):
-    _singular = ShipStat
+    __singular__ = ShipStat
 
 
 class Action(LoadDataMixin, ReperMixin):
@@ -44,7 +43,7 @@ class Action(LoadDataMixin, ReperMixin):
 
 
 class Actions(BaseItemListMixin):
-    _singular = Action
+    __singular__ = Action
 
 
 class Maneuver(ReperMixin):
@@ -71,7 +70,7 @@ class Maneuver(ReperMixin):
         return obj
 
 
-class ShipDial:
+class ShipDial(SearchableItemMixin):
     """
     The ship's dial containing all of the possible maneuvers the ship can perform. The returned object
     is a ShipDial with as a list of Maneuver objects.
@@ -92,17 +91,6 @@ class ShipDial:
 
     def __len__(self):
         return len(self._items)
-
-    def __getitem__(self, item):
-        if isinstance(item, int):
-            return self._items[item]
-        elif isinstance(item, str):
-            _tmp = ShipDial()
-            for maneuver in self._items:
-                for c in maneuver:
-                    if item.lower() in str(getattr(maneuver, c)).lower():
-                        _tmp._items.append(maneuver)
-            return _tmp
 
     def __repr__(self):
         return f"ShipDial({[m for m in self._items][:5]}{' ...' if len(self._items) > 5 else ''})"

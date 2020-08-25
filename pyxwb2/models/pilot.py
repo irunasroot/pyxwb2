@@ -35,7 +35,7 @@ class Pilot(ReperMixin):
 
 
 class Pilots(BaseItemListMixin, ReperMixin):
-    _singular = Pilot
+    __singular__ = Pilot
 
     def __getitem__(self, item):
         return self._items[item]

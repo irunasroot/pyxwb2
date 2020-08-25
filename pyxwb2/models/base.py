@@ -49,7 +49,7 @@ class Faction:
 
 
 class Factions(BaseItemListMixin):
-    _singular = Faction
+    __singular__ = Faction
 
     def __contains__(self, item):
         all_names = [p.xws for p in self._items] + [p.name for p in self._items]
@@ -67,7 +67,7 @@ class Factions(BaseItemListMixin):
 
 class Ship:
     def __init__(self):
-        self._skip_attr = ["pilots", "actions, dial, stats"]
+        self._skip_attr = ["pilots", "actions", "dial", "stats"]
         self.name = None
         self.xws = None
         self.size = None
@@ -91,8 +91,8 @@ class Ship:
 
 
 class Ships(BaseItemListMixin):
-    _singular = Ship
+    __singular__ = Ship
 
     def __contains__(self, item):
-        all_names = [s.xws for s in self._items] + [s.name for s in self._items]
-        return item in all_names
+        return item in [s.xws for s in self._items] + \
+               [s.name for s in self._items]

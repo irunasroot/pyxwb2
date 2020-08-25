@@ -5,11 +5,20 @@ from pathlib import Path, PurePath
 from jsonpath2 import Path as JPath
 
 from .models.base import Faction, Factions, Ship, Ships
-from .models.misc import Actions, Conditions, DamageDeck, ShipStats
+from .models.misc import Actions, Conditions, DamageDeck, ShipStats, Upgrades
 from .models.pilot import Pilots, Pilot
 from .utils import manifest
 
 _local_path = Path(__file__).parents[0]
+
+
+def _load_simple_manifest_data(cls, set_file):
+    obj = cls()
+    with open(PurePath(_local_path, manifest[set_file]).as_posix(), "r") as f:
+        _set = json.load(f)
+    for _dc in _set:
+        obj.append(obj.__singular__.load_data(_dc))
+    return obj
 
 
 def _load_complex_manifest_data(cls, manifest_set, inner_set=None):
@@ -19,11 +28,10 @@ def _load_complex_manifest_data(cls, manifest_set, inner_set=None):
             _set = json.load(f)
         try:
             for _dc in _set[inner_set]:
-                obj.append(obj._singular.load_data(_dc))
+                obj.append(obj.__singular__.load_data(_dc))
         except (KeyError, TypeError):
             for _dc in _set:
-                obj.append(obj._singular.load_data(_dc))
-
+                obj.append(obj.__singular__.load_data(_dc))
     return obj
 
 
@@ -112,10 +120,7 @@ class XwingDataPack:
                     self.pilots.append(_pilot)
 
         self.actions = _load_complex_manifest_data(Actions, "actions")
-
-        with open(PurePath(_local_path, manifest["conditions"]).as_posix(), "r") as f:
-            self.conditions = Conditions.load_data(json.load(f))
-
+        self.conditions = _load_simple_manifest_data(Conditions, "conditions")
         self.damage_deck = _load_complex_manifest_data(DamageDeck, "damagedecks", "cards")
         self.stats = _load_complex_manifest_data(ShipStats, "stats")
-
+        self.upgrades = _load_complex_manifest_data(Upgrades, "upgrades")
