@@ -2,6 +2,13 @@
 
 An Xwing builder written in python
 
+master branch:  
+![Unittest - master](https://github.com/minsis/pyxwb2/workflows/Python%20package/badge.svg?branch=master)
+
+beta branch:  
+![Unittest - beta](https://github.com/minsis/pyxwb2/workflows/Python%20package/badge.svg?branch=beta)
+
+
 ## Installation
 Install from pypi
 ```bash
