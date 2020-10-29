@@ -6,12 +6,14 @@ from pyxwb2.utils import manifest
 
 from . import ReperMixin, BaseItemListMixin
 from .base import Ship
-from .misc import ShipAbility
+from .misc import ShipAbility, Upgrades
 from .exceptions import PilotsMissingException
 
 
 class Pilot(ReperMixin):
+
     def __init__(self):
+        self.slots = None
         self._skip_attr = ["vendor", "alt", "shipAbility"]
 
     def __contains__(self, item):
@@ -44,6 +46,13 @@ class Pilots(BaseItemListMixin, ReperMixin):
         all_names = [p.xws for p in self._items] + [p.name for p in self._items]
 
         return item in all_names
+
+    def export(self):
+        _pilots = dict()
+        for pilot in self._items:
+            _pilots["id"] = pilot.xws
+
+
 
     @classmethod
     def load_data(cls, pilots, faction):
@@ -79,8 +88,37 @@ class Pilots(BaseItemListMixin, ReperMixin):
                 _ship = Ship.load_data(ship_file_data)
                 _ship.faction = faction
                 _pilot = Pilot.load_data(pilot_file_data[0])
-                _pilot.__setattr__("ship", _ship)
-                _pilot.__setattr__("faction", faction)
+                setattr(_pilot, "ship", _ship)
+                setattr(_pilot, "faction", faction)
+
+                try:
+                    setattr(_pilot, "slots", [s for s in pilot_file_data[0]["slots"]])
+                except KeyError:
+                    pass
+
+                if "upgrades" in pilot:
+                    _upgrades = list()
+                    _slots = [s.replace(" ", "").lower() for s in _pilot.slots]
+                    for slot, upgrades in pilot["upgrades"].items():
+                        if slot not in _slots:
+                            continue
+                        for fn in manifest["upgrades"]:
+                            if slot not in fn:
+                                continue
+                            manifest_upgrade_fn = PurePath(Path(__file__).parents[1], fn).as_posix()
+                            with open(manifest_upgrade_fn, "r") as fn:
+                                upgrade_file_data = json.load(fn)
+                            for upgrade in upgrades:
+                                for ufd in upgrade_file_data:
+                                    if upgrade == ufd["xws"]:
+                                        _upgrades.append(ufd)
+                    setattr(_pilot, "upgrades", Upgrades.load_data(_upgrades))
+
+                try:
+                    setattr(_pilot, "points", pilot_file_data[0]["cost"])
+                except KeyError:
+                    pass
+
                 obj._items.append(_pilot)
 
         if not len(obj):

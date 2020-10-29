@@ -88,5 +88,6 @@
       "direction": null,
       "xws": "stationary"
     }
-  }
+  },
+  "version": "1.0.0"
 }

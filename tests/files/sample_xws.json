@@ -2,25 +2,25 @@
     "name": "X-Squad",
     "faction": "separatistalliance",
 	"description": "Test xws 2.0.0 data",
-	"points": 76,
+	"points": 80,
 	"version": "2.0.0",
     "pilots": [
         {
             "id": "bombardmentdrone",
-			"points": 44,
+			"points": 46,
             "upgrades": {
-				"modification": ["angleddeflectors"],
+				"modification": ["afterburners"],
                 "configuration": ["landingstruts"],
-                "device": ["drk1probedroids"],
-                "sensor": ["trajectorysimulator"]
+                "device": ["clustermines"],
+                "sensor": ["passivesensors"]
             }
         },
         {
-            "id": "dfs311-vultureclassdroidfighter",
-			"points": 32,
+            "id": "dfs311",
+			"points": 34,
             "upgrades": {
                 "missile": ["clustermissiles"],
-                "modification": ["angleddeflectors"],
+                "modification": ["afterburners"],
                 "configuration": ["grapplingstruts"]
             },
 			"vendor": {
