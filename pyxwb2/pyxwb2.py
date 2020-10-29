@@ -12,6 +12,37 @@ from .utils import manifest
 _local_path = Path(__file__).parents[0]
 
 
+def _calculate_cost(squad):
+    for pilot in squad.pilots:
+        _cost = int()
+        try:
+            _cost += pilot.cost
+        except AttributeError:
+            continue
+
+        for upgrade in pilot.upgrades:
+
+            try:
+                _cost += upgrade.cost["value"]
+            except (KeyError,):
+                pass
+
+            try:
+                _cost += upgrade.cost["values"][str(getattr(pilot, upgrade.cost["variable"]))]
+            except (KeyError, AttributeError):
+                pass
+
+            for s in pilot.ship.stats:
+                try:
+                    stat_value = s.value if s.type == upgrade.cost["variable"] else None
+                    _cost += upgrade.cost["values"][stat_value]
+                except (KeyError,):
+                    continue
+        setattr(pilot, "points", _cost)
+
+    setattr(squad, "points", sum([p.points for p in squad.pilots]))
+
+
 def _load_simple_manifest_data(cls, set_file):
     obj = cls()
     with open(PurePath(_local_path, manifest[set_file]).as_posix(), "r") as f:
@@ -49,6 +80,46 @@ class XwingSquadron:
         self.faction = None
         self.pilots = None
 
+    def export_squad(self, as_dict=False):
+        """
+        Export the squad in XWS format. By default this is exported as a json string.
+
+        :param as_dict: Set to True if you want the returned data as a dict instead of json
+        :return: XWS formatted data
+        """
+        _squad = dict()
+
+        _squad["name"] = getattr(self, "name", "undefined")
+        _squad["faction"] = self.faction.xws
+        _squad["points"] = self.points
+        _squad["version"] = self.version
+
+        _squad["pilots"] = [
+            {
+                "id": p.xws,
+                "points": p.points,
+                "upgrades": {
+                    s.replace(" ", "").lower(): [
+                        u.xws
+                        for u in p.upgrades
+                        if s in u.sides[0]["slots"]
+                    ]
+                    for s in set(p.slots)
+                }
+            }
+            for p in self.pilots
+        ]
+
+        _squad["vendor"] = {
+            "pyxwb2": {
+                "builder_url": "https://github.com/minsis/pyxwb2"
+            }
+        }
+
+        if as_dict:
+            return _squad
+        return json.dumps(_squad)
+
     def import_squad(self, xws):
         """
         Import the xws data to validate the squad
@@ -80,6 +151,8 @@ class XwingSquadron:
         self.faction = Faction.load_data(_xws_data.get("faction"))
         self.pilots = Pilots.load_data(_xws_data.get("pilots"), self.faction)
 
+        _calculate_cost(self)
+
     @staticmethod
     def _validate_schema(xws_data):
         schema_fn = PurePath(_local_path, "data/xws_schema.json").as_posix()
@@ -90,6 +163,7 @@ class XwingSquadron:
 
 
 class XwingDataPack:
+
     def __init__(self):
         self.factions = Factions()
         self.pilots = Pilots()
