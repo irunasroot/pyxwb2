@@ -15,6 +15,10 @@
     "G": {
       "name": "Green",
       "xws": "green"
+    },
+    "P":{
+      "name": "Purple",
+      "xws": "purple"
     }
   },
   "maneuvers": {
@@ -89,5 +93,5 @@
       "xws": "stationary"
     }
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
